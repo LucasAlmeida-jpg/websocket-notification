@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PushSubscriptionController;
 use App\Http\Controllers\Api\RepostController;
+use App\Http\Controllers\Api\ShareController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -25,6 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/posts/{post}',    [PostController::class, 'destroy']);
     Route::post('/posts/{post}/like',   [LikeController::class,   'toggle']);
     Route::post('/posts/{post}/repost', [RepostController::class, 'toggle']);
+    Route::post('/posts/{post}/send',   [ShareController::class,  'send']);
+
+    Route::get('/following', [FollowController::class, 'following']);
 
     Route::post('/users/{user}/follow', [FollowController::class, 'toggle']);
     Route::get('/users/{user}',         [ProfileController::class, 'show']);
