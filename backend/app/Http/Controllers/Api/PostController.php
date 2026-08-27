@@ -34,6 +34,8 @@ class PostController extends Controller
             }
         }
 
+        $this->notifyMentions($data['body'], $request->user(), $post->id);
+
         $post->load('user');
 
         return response()->json($this->formatPost($post, $request->user()), 201);
@@ -82,6 +84,25 @@ class PostController extends Controller
                 'avatar' => $post->user->avatar,
             ],
         ];
+    }
+
+    private function notifyMentions(string $body, User $actor, int $postId): void
+    {
+        preg_match_all('/@([\w]+)/', $body, $matches);
+        $tokens = array_unique($matches[1] ?? []);
+        if (empty($tokens)) return;
+
+        $mentioned = User::where('id', '!=', $actor->id)
+            ->where(function ($q) use ($tokens) {
+                foreach ($tokens as $token) {
+                    $q->orWhere('name', 'like', $token . '%');
+                }
+            })
+            ->get();
+
+        foreach ($mentioned as $user) {
+            $this->notify($user, $actor, 'mention', 'mencionou você em um post.', $postId);
+        }
     }
 
     private function notify(User $recipient, User $actor, string $type, string $message, int $resourceId): void
