@@ -12,6 +12,22 @@ use Illuminate\Http\Request;
 
 class FollowController extends Controller
 {
+    public function following(Request $request): JsonResponse
+    {
+        $viewer = $request->user();
+
+        $users = $viewer->following()
+            ->with('following:id,name,avatar')
+            ->get()
+            ->map(fn($f) => [
+                'id'     => $f->following->id,
+                'name'   => $f->following->name,
+                'avatar' => $f->following->avatar,
+            ]);
+
+        return response()->json($users);
+    }
+
     public function toggle(Request $request, User $user): JsonResponse
     {
         $viewer = $request->user();
