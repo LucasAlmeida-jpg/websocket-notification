@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
+    use HasFactory;
     protected $fillable = ['user_id', 'parent_id', 'body', 'likes_count', 'replies_count', 'reposts_count'];
 
     protected $casts = ['likes_count' => 'integer', 'replies_count' => 'integer', 'reposts_count' => 'integer'];
