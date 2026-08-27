@@ -38,10 +38,7 @@ class ProfileService
     public function search(string $query, User $viewer): array
     {
         return User::where('id', '!=', $viewer->id)
-            ->where(function ($q) use ($query) {
-                $q->where('name', 'like', "%{$query}%")
-                  ->orWhere('email', 'like', "%{$query}%");
-            })
+            ->where('name', 'like', "%{$query}%")
             ->limit(10)
             ->get()
             ->map(fn($u) => [
