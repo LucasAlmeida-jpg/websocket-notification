@@ -40,15 +40,17 @@
         <span class="text-sm font-medium">Notifications</span>
       </NuxtLink>
 
-      <NuxtLink
-        v-if="authStore.user"
-        :to="`/profile/${authStore.user.id}`"
-        class="flex items-center gap-3 px-3 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition"
-        active-class="text-white bg-neutral-900"
-      >
-        <User class="w-5 h-5" />
-        <span class="text-sm font-medium">Profile</span>
-      </NuxtLink>
+      <ClientOnly>
+        <NuxtLink
+          v-if="authStore.user"
+          :to="`/profile/${authStore.user.id}`"
+          class="flex items-center gap-3 px-3 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition"
+          active-class="text-white bg-neutral-900"
+        >
+          <User class="w-5 h-5" />
+          <span class="text-sm font-medium">Profile</span>
+        </NuxtLink>
+      </ClientOnly>
     </nav>
 
     <div class="flex flex-col gap-2 mt-4">
@@ -119,14 +121,16 @@
       </div>
     </NuxtLink>
 
-    <NuxtLink
-      v-if="authStore.user"
-      :to="`/profile/${authStore.user.id}`"
-      class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl text-neutral-500 hover:text-white transition"
-      active-class="text-white"
-    >
-      <User class="w-6 h-6" />
-    </NuxtLink>
+    <ClientOnly>
+      <NuxtLink
+        v-if="authStore.user"
+        :to="`/profile/${authStore.user.id}`"
+        class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl text-neutral-500 hover:text-white transition"
+        active-class="text-white"
+      >
+        <User class="w-6 h-6" />
+      </NuxtLink>
+    </ClientOnly>
   </nav>
 </template>
 
