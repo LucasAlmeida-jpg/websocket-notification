@@ -83,6 +83,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted } from 'vue'
 import { Bell, BellOff, CheckCheck, LogOut, RefreshCw, Loader2 } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useNotificationStore } from '~/stores/notifications'
@@ -117,6 +118,15 @@ async function fetchNotifications(page = 1) {
   }
 }
 
+async function pollUnread() {
+  try {
+    const { count } = await get<{ count: number }>('/api/notifications/unread-count')
+    if (count !== notifStore.unreadCount) {
+      await fetchNotifications(1)
+    }
+  } catch {}
+}
+
 async function markRead(id: string) {
   notifStore.markRead(id)
   await patch(`/api/notifications/${id}/read`).catch(() => {})
@@ -139,10 +149,17 @@ async function doLogout() {
   router.push('/login')
 }
 
+let pollInterval: ReturnType<typeof setInterval> | null = null
+
 onMounted(async () => {
   authStore.restoreFromStorage()
   if (!authStore.isAuthenticated) return
   await fetchNotifications(1)
   if (authStore.user) $pusher.connect(authStore.user.id)
+  pollInterval = setInterval(pollUnread, 5000)
+})
+
+onUnmounted(() => {
+  if (pollInterval) clearInterval(pollInterval)
 })
 </script>
