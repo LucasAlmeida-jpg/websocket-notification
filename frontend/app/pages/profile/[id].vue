@@ -25,7 +25,13 @@
           <div class="bg-[#181818] border border-neutral-800 rounded-2xl p-6 mb-4">
             <div class="flex items-start justify-between gap-4">
               <div class="flex items-start gap-4">
+                <img
+                  v-if="profile.avatar"
+                  :src="profile.avatar"
+                  class="w-16 h-16 rounded-full object-cover shrink-0"
+                />
                 <div
+                  v-else
                   class="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-white shrink-0"
                   :class="avatarColor(profile.id)"
                 >
