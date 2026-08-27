@@ -20,6 +20,8 @@ export default defineNuxtConfig({
     },
   },
 
+  css: ['~/assets/css/main.css'],
+
   routeRules: {
     '/api/**': { proxy: process.env.NUXT_PUBLIC_API_BASE ?? 'http://localhost:8080/api/**' },
   },
