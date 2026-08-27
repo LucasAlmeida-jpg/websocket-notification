@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    protected $fillable = ['user_id', 'parent_id', 'body', 'likes_count', 'replies_count'];
+    protected $fillable = ['user_id', 'parent_id', 'body', 'likes_count', 'replies_count', 'reposts_count'];
 
-    protected $casts = ['likes_count' => 'integer', 'replies_count' => 'integer'];
+    protected $casts = ['likes_count' => 'integer', 'replies_count' => 'integer', 'reposts_count' => 'integer'];
 
     public function user()
     {
@@ -33,5 +33,15 @@ class Post extends Model
     public function isLikedBy(User $user): bool
     {
         return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    public function reposts()
+    {
+        return $this->hasMany(Repost::class);
+    }
+
+    public function isRepostedBy(User $user): bool
+    {
+        return $this->reposts()->where('user_id', $user->id)->exists();
     }
 }
