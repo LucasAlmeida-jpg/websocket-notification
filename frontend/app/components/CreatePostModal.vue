@@ -33,7 +33,7 @@
           >
             {{ initials(authStore.user?.name ?? '') }}
           </div>
-          <div class="flex-1">
+          <div class="flex-1 relative">
             <textarea
               ref="textareaRef"
               v-model="body"
@@ -41,9 +41,33 @@
               maxlength="500"
               placeholder="What's on your mind?"
               class="w-full bg-transparent text-white text-sm placeholder-neutral-600 outline-none resize-none leading-relaxed"
+              @input="onInput"
+              @keydown="onKeydown"
               @keydown.ctrl.enter="submit"
               @keydown.meta.enter="submit"
             />
+
+            <div
+              v-if="mentionOpen && mentionUsers.length > 0"
+              class="absolute left-0 z-10 mt-1 w-64 bg-[#222] border border-neutral-700 rounded-xl overflow-hidden shadow-xl"
+            >
+              <button
+                v-for="(u, i) in mentionUsers"
+                :key="u.id"
+                class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left transition"
+                :class="i === mentionIndex ? 'bg-neutral-700 text-white' : 'text-neutral-300 hover:bg-neutral-700'"
+                @mousedown.prevent="insertMention(u)"
+              >
+                <div
+                  class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+                  :class="avatarColor(u.id)"
+                >
+                  {{ initials(u.name) }}
+                </div>
+                {{ u.name }}
+              </button>
+            </div>
+
             <div class="flex items-center justify-between mt-3 pt-3 border-t border-neutral-800">
               <span
                 class="text-xs"
@@ -90,12 +114,20 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-const { post: apiPost } = useApi()
+const { post: apiPost, get } = useApi()
 
 const body = ref('')
 const loading = ref(false)
 const error = ref('')
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+
+interface MentionUser { id: number; name: string }
+const mentionOpen = ref(false)
+const mentionUsers = ref<MentionUser[]>([])
+const mentionIndex = ref(0)
+const mentionStart = ref(-1)
+
+let mentionTimer: ReturnType<typeof setTimeout> | null = null
 
 const avatarColors = [
   'bg-violet-600',
@@ -119,9 +151,77 @@ function initials(name: string): string {
     .toUpperCase()
 }
 
+function getMentionQuery(): string | null {
+  const el = textareaRef.value
+  if (!el) return null
+  const cursor = el.selectionStart
+  const text = body.value.substring(0, cursor)
+  const match = text.match(/@(\w*)$/)
+  if (!match) return null
+  mentionStart.value = cursor - match[0].length
+  return match[1]
+}
+
+function onInput() {
+  const q = getMentionQuery()
+  if (q === null) {
+    mentionOpen.value = false
+    return
+  }
+  if (mentionTimer) clearTimeout(mentionTimer)
+  mentionTimer = setTimeout(async () => {
+    if (!q) {
+      mentionUsers.value = []
+      mentionOpen.value = false
+      return
+    }
+    try {
+      const res = await get<MentionUser[]>(`/api/users?q=${encodeURIComponent(q)}`)
+      mentionUsers.value = res.slice(0, 5)
+      mentionIndex.value = 0
+      mentionOpen.value = mentionUsers.value.length > 0
+    } catch {
+      mentionOpen.value = false
+    }
+  }, 250)
+}
+
+function onKeydown(e: KeyboardEvent) {
+  if (!mentionOpen.value) return
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    mentionIndex.value = (mentionIndex.value + 1) % mentionUsers.value.length
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    mentionIndex.value = (mentionIndex.value - 1 + mentionUsers.value.length) % mentionUsers.value.length
+  } else if (e.key === 'Enter' || e.key === 'Tab') {
+    e.preventDefault()
+    insertMention(mentionUsers.value[mentionIndex.value])
+  } else if (e.key === 'Escape') {
+    mentionOpen.value = false
+  }
+}
+
+function insertMention(user: MentionUser) {
+  const el = textareaRef.value
+  if (!el) return
+  const cursor = el.selectionStart
+  const firstName = user.name.split(' ')[0]
+  const before = body.value.substring(0, mentionStart.value)
+  const after = body.value.substring(cursor)
+  body.value = `${before}@${firstName} ${after}`
+  mentionOpen.value = false
+  nextTick(() => {
+    const pos = mentionStart.value + firstName.length + 2
+    el.setSelectionRange(pos, pos)
+    el.focus()
+  })
+}
+
 function close() {
   body.value = ''
   error.value = ''
+  mentionOpen.value = false
   emit('update:modelValue', false)
 }
 

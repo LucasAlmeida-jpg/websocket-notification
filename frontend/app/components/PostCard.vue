@@ -35,9 +35,8 @@
       <button
         class="text-neutral-200 text-sm mt-1 text-left w-full leading-relaxed hover:text-white transition"
         @click="navigateTo(`/post/${post.id}`)"
-      >
-        {{ post.body }}
-      </button>
+        v-html="renderedBody"
+      />
 
       <div class="flex items-center gap-4 mt-3">
         <button
@@ -79,6 +78,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
 import { Heart, MessageCircle, Repeat2, Send, Trash2 } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import type { Post } from '~/stores/feed'
@@ -89,6 +92,13 @@ const emit = defineEmits<{ like: [id: number]; repost: [id: number]; delete: [id
 const authStore = useAuthStore()
 
 const isOwn = computed(() => authStore.user?.id === props.post.user.id)
+
+const renderedBody = computed(() =>
+  escapeHtml(props.post.body).replace(
+    /@(\w+)/g,
+    '<span class="text-blue-400 font-medium">@$1</span>',
+  )
+)
 
 const timeAgo = computed(() => {
   const diff = Date.now() - new Date(props.post.created_at).getTime()
