@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Check, Trash2, Heart, MessageCircle, UserPlus, AtSign, Bell, Repeat2, Send } from 'lucide-vue-next'
-import type { Notification } from '~/stores/notifications'
+import type { Notification } from '~/types'
 
 const props = defineProps<{ notification: Notification }>()
 const emit = defineEmits<{ markRead: [id: string]; remove: [id: string] }>()

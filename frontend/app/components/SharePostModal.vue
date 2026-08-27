@@ -73,11 +73,12 @@
 import { ref, computed, watch } from 'vue'
 import { X, Loader2, Send, Search as SearchIcon, UserX } from 'lucide-vue-next'
 import { useApi } from '~/composables/useApi'
+import type { User } from '~/types'
 
 const props = defineProps<{ modelValue: boolean; postId: number | null }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 
-interface FollowingUser { id: number; name: string; avatar: string | null }
+type FollowingUser = User
 
 const { get, post: apiPost } = useApi()
 

@@ -28,7 +28,7 @@
 import { ref, computed } from 'vue'
 import { X, Heart, MessageCircle, UserPlus, AtSign, Bell } from 'lucide-vue-next'
 import { useNotificationStore } from '~/stores/notifications'
-import type { NotificationData } from '~/stores/notifications'
+import type { NotificationData } from '~/types'
 
 const notifStore = useNotificationStore()
 const toast = ref<NotificationData | null>(null)

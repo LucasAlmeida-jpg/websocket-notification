@@ -113,7 +113,7 @@ import { ref, watch, nextTick } from 'vue'
 import { X, Loader2, CircleX } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useApi } from '~/composables/useApi'
-import type { Post } from '~/stores/feed'
+import type { Post } from '~/types'
 
 const props = defineProps<{
   modelValue: boolean
@@ -133,7 +133,8 @@ const loading = ref(false)
 const error = ref('')
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
-interface MentionUser { id: number; name: string; avatar: string | null }
+import type { User } from '~/types'
+type MentionUser = User
 const mentionOpen = ref(false)
 const mentionUsers = ref<MentionUser[]>([])
 const mentionIndex = ref(0)

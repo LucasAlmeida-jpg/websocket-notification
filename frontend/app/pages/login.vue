@@ -90,7 +90,7 @@ import { ref, reactive } from 'vue'
 import { Loader2, ChevronRight } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useApi } from '~/composables/useApi'
-import type { User } from '~/stores/auth'
+import type { User } from '~/types'
 
 definePageMeta({ middleware: [] })
 

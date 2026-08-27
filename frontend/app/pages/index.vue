@@ -71,7 +71,7 @@ import { Pencil, Loader2, MessageCircle } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useNotificationStore } from '~/stores/notifications'
 import { useFeedStore } from '~/stores/feed'
-import type { Post } from '~/stores/feed'
+import type { Post } from '~/types'
 import { useApi } from '~/composables/useApi'
 
 definePageMeta({ middleware: ['auth'] })

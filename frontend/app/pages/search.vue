@@ -77,21 +77,18 @@
 import { ref } from 'vue'
 import { Search, Loader2, UserX } from 'lucide-vue-next'
 import { useApi } from '~/composables/useApi'
+import type { User } from '~/types'
 
 definePageMeta({ middleware: ['auth'] })
 
-interface User {
-  id: number
-  name: string
-  avatar: string | null
-  bio: string | null
+interface SearchUser extends User {
   is_following: boolean
 }
 
 const { get, post } = useApi()
 
 const query = ref('')
-const results = ref<User[]>([])
+const results = ref<SearchUser[]>([])
 const loading = ref(false)
 const showCreateModal = ref(false)
 const followingInProgress = ref(new Set<number>())
@@ -124,7 +121,7 @@ function onInput() {
   debounceTimer = setTimeout(async () => {
     loading.value = true
     try {
-      const res = await get<User[]>(`/api/users?q=${encodeURIComponent(query.value)}`)
+      const res = await get<SearchUser[]>(`/api/users?q=${encodeURIComponent(query.value)}`)
       results.value = res
     } catch {
       results.value = []
@@ -134,7 +131,7 @@ function onInput() {
   }, 350)
 }
 
-async function toggleFollow(user: User) {
+async function toggleFollow(user: SearchUser) {
   if (followingInProgress.value.has(user.id)) return
   followingInProgress.value = new Set(followingInProgress.value).add(user.id)
   try {

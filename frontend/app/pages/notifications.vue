@@ -74,7 +74,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { BellOff, CheckCheck, Loader2 } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useNotificationStore } from '~/stores/notifications'
-import type { Notification } from '~/stores/notifications'
+import type { Notification } from '~/types'
 import { useApi } from '~/composables/useApi'
 
 definePageMeta({ middleware: ['auth'] })

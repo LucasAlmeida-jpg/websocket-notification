@@ -135,7 +135,7 @@ import { ref, onMounted } from 'vue'
 import { ArrowLeft, Heart, MessageCircle, Repeat2, Send, Trash2, Loader2 } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useApi } from '~/composables/useApi'
-import type { Post } from '~/stores/feed'
+import type { Post } from '~/types'
 
 definePageMeta({ middleware: ['auth'] })
 

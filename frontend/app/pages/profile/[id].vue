@@ -110,7 +110,7 @@ import { ref, onMounted } from 'vue'
 import { ArrowLeft, User, Loader2, MessageCircle } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useApi } from '~/composables/useApi'
-import type { Post } from '~/stores/feed'
+import type { Post } from '~/types'
 
 definePageMeta({ middleware: ['auth'] })
 

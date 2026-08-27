@@ -95,7 +95,7 @@ function escapeHtml(text: string): string {
 }
 import { Heart, MessageCircle, Repeat2, Send, Trash2 } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
-import type { Post } from '~/stores/feed'
+import type { Post } from '~/types'
 
 const props = defineProps<{ post: Post }>()
 const emit = defineEmits<{ like: [id: number]; repost: [id: number]; delete: [id: number] }>()
