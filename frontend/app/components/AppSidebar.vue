@@ -60,6 +60,15 @@
         <span class="text-sm font-medium">New Thread</span>
       </button>
 
+      <NuxtLink
+        to="/settings"
+        class="flex items-center gap-3 px-3 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition"
+        active-class="text-white bg-neutral-900"
+      >
+        <Settings class="w-5 h-5" />
+        <span class="text-sm font-medium">Settings</span>
+      </NuxtLink>
+
       <button
         class="flex items-center gap-3 px-3 py-3 rounded-xl text-neutral-400 hover:text-red-400 hover:bg-neutral-900 transition w-full text-left"
         @click="doLogout"
@@ -122,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { House, Search, Bell, User, Pencil, LogOut } from 'lucide-vue-next'
+import { House, Search, Bell, User, Pencil, LogOut, Settings } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useNotificationStore } from '~/stores/notifications'
 import { useApi } from '~/composables/useApi'
