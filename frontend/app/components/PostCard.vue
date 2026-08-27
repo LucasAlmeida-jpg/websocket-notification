@@ -60,8 +60,13 @@
           <span class="text-xs">{{ post.replies_count }}</span>
         </button>
 
-        <button class="flex items-center gap-1.5 text-neutral-500 hover:text-white transition">
+        <button
+          class="flex items-center gap-1.5 transition"
+          :class="post.reposted ? 'text-green-500' : 'text-neutral-500 hover:text-green-500'"
+          @click="handleRepost"
+        >
           <Repeat2 class="w-4 h-4" />
+          <span class="text-xs">{{ post.reposts_count || '' }}</span>
         </button>
 
         <button class="flex items-center gap-1.5 text-neutral-500 hover:text-white transition">
@@ -79,7 +84,7 @@ import { useAuthStore } from '~/stores/auth'
 import type { Post } from '~/stores/feed'
 
 const props = defineProps<{ post: Post }>()
-const emit = defineEmits<{ like: [id: number]; delete: [id: number] }>()
+const emit = defineEmits<{ like: [id: number]; repost: [id: number]; delete: [id: number] }>()
 
 const authStore = useAuthStore()
 
@@ -119,6 +124,10 @@ function initials(name: string): string {
 
 function handleLike() {
   emit('like', props.post.id)
+}
+
+function handleRepost() {
+  emit('repost', props.post.id)
 }
 
 function handleDelete() {
