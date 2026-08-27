@@ -7,7 +7,9 @@ export interface Post {
   body: string
   likes_count: number
   replies_count: number
+  reposts_count: number
   liked: boolean
+  reposted: boolean
   created_at: string
   user: User
 }
@@ -44,5 +46,13 @@ export const useFeedStore = defineStore('feed', () => {
     }
   }
 
-  return { items, loading, currentPage, lastPage, setItems, prependPost, removePost, toggleLike }
+  function toggleRepost(id: number, reposted: boolean, repostsCount: number) {
+    const post = items.value.find((p: Post) => p.id === id)
+    if (post) {
+      post.reposted = reposted
+      post.reposts_count = repostsCount
+    }
+  }
+
+  return { items, loading, currentPage, lastPage, setItems, prependPost, removePost, toggleLike, toggleRepost }
 })
