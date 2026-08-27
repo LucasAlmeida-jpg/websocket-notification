@@ -4,6 +4,7 @@ import { ref, computed } from 'vue'
 export interface User {
   id: number
   name: string
+  bio: string | null
   avatar: string | null
 }
 
