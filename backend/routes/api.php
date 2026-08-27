@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PushSubscriptionController;
 use App\Http\Controllers\Api\RepostController;
+use App\Http\Controllers\Api\MeController;
 use App\Http\Controllers\Api\ShareController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,8 +17,9 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me',      [AuthController::class, 'me']);
+    Route::post('/logout',  [AuthController::class, 'logout']);
+    Route::get('/me',       [AuthController::class, 'me']);
+    Route::patch('/me',     [MeController::class,   'update']);
 
     Route::get('/feed', FeedController::class);
 
