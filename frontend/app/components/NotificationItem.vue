@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Check, Trash2, Heart, MessageCircle, UserPlus, AtSign, Bell, Repeat2 } from 'lucide-vue-next'
+import { Check, Trash2, Heart, MessageCircle, UserPlus, AtSign, Bell, Repeat2, Send } from 'lucide-vue-next'
 import type { Notification } from '~/stores/notifications'
 
 const props = defineProps<{ notification: Notification }>()
@@ -55,6 +55,7 @@ const iconMap: Record<string, { component: unknown; bg: string; color: string }>
   follow:  { component: UserPlus,       bg: 'bg-violet-500/20', color: 'text-violet-400' },
   mention: { component: AtSign,         bg: 'bg-amber-500/20',  color: 'text-amber-400' },
   repost:  { component: Repeat2,        bg: 'bg-green-500/20',  color: 'text-green-400' },
+  share:   { component: Send,           bg: 'bg-sky-500/20',    color: 'text-sky-400' },
 }
 
 const iconComponent = computed(() => iconMap[props.notification.data.type]?.component ?? Bell)
