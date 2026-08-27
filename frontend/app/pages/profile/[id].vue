@@ -73,6 +73,7 @@
               :key="p.id"
               :post="p"
               @like="handleLike"
+              @repost="handleRepost"
               @delete="handlePostDelete"
             />
 
@@ -204,6 +205,17 @@ async function handleLike(id: number) {
     if (p) {
       p.liked = res.liked
       p.likes_count = res.likes_count
+    }
+  } catch {}
+}
+
+async function handleRepost(id: number) {
+  try {
+    const res = await apiPost<{ reposted: boolean; reposts_count: number }>(`/api/posts/${id}/repost`, {})
+    const p = posts.value.find((x) => x.id === id)
+    if (p) {
+      p.reposted = res.reposted
+      p.reposts_count = res.reposts_count
     }
   } catch {}
 }

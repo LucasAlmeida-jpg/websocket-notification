@@ -33,6 +33,7 @@
             :key="post.id"
             :post="post"
             @like="handleLike"
+            @repost="handleRepost"
             @delete="handleDelete"
           />
 
@@ -109,6 +110,13 @@ async function handleLike(id: number) {
   try {
     const res = await apiPost<{ liked: boolean; likes_count: number }>(`/api/posts/${id}/like`, {})
     feedStore.toggleLike(id, res.liked, res.likes_count)
+  } catch {}
+}
+
+async function handleRepost(id: number) {
+  try {
+    const res = await apiPost<{ reposted: boolean; reposts_count: number }>(`/api/posts/${id}/repost`, {})
+    feedStore.toggleRepost(id, res.reposted, res.reposts_count)
   } catch {}
 }
 
