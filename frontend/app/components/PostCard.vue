@@ -68,16 +68,21 @@
           <span class="text-xs">{{ post.reposts_count || '' }}</span>
         </button>
 
-        <button class="flex items-center gap-1.5 text-neutral-500 hover:text-white transition">
+        <button
+          class="flex items-center gap-1.5 text-neutral-500 hover:text-white transition"
+          @click.stop="showShare = true"
+        >
           <Send class="w-4 h-4" />
         </button>
       </div>
     </div>
   </div>
+
+  <SharePostModal v-model="showShare" :post-id="post.id" />
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -90,6 +95,7 @@ const props = defineProps<{ post: Post }>()
 const emit = defineEmits<{ like: [id: number]; repost: [id: number]; delete: [id: number] }>()
 
 const authStore = useAuthStore()
+const showShare = ref(false)
 
 const isOwn = computed(() => authStore.user?.id === props.post.user.id)
 
