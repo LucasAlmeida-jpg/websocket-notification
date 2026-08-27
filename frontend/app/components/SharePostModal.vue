@@ -45,7 +45,13 @@
               :disabled="sent.has(u.id) || sending.has(u.id)"
               @click="send(u)"
             >
+              <img
+                v-if="u.avatar"
+                :src="u.avatar"
+                class="w-8 h-8 rounded-full object-cover shrink-0"
+              />
               <div
+                v-else
                 class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
                 :class="avatarColor(u.id)"
               >

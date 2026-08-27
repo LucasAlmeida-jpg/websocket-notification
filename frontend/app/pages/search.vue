@@ -33,7 +33,13 @@
             class="flex items-center gap-3 px-4 py-3 bg-[#181818] border border-neutral-800 rounded-2xl"
           >
             <NuxtLink :to="`/profile/${user.id}`" class="flex items-center gap-3 flex-1 min-w-0">
+              <img
+                v-if="user.avatar"
+                :src="user.avatar"
+                class="w-10 h-10 rounded-full object-cover shrink-0"
+              />
               <div
+                v-else
                 class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
                 :class="avatarColor(user.id)"
               >

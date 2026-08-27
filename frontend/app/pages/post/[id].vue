@@ -25,7 +25,13 @@
           <div class="bg-[#181818] border border-neutral-800 rounded-2xl p-4 mb-3">
             <div class="flex gap-3">
               <button @click="navigateTo(`/profile/${post.user.id}`)">
+                <img
+                  v-if="post.user.avatar"
+                  :src="post.user.avatar"
+                  class="w-10 h-10 rounded-full object-cover shrink-0"
+                />
                 <div
+                  v-else
                   class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
                   :class="avatarColor(post.user.id)"
                 >

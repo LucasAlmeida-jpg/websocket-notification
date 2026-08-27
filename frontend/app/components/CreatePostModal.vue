@@ -27,7 +27,13 @@
         </div>
 
         <div class="flex gap-3">
+          <img
+            v-if="authStore.user?.avatar"
+            :src="authStore.user.avatar"
+            class="w-10 h-10 rounded-full object-cover shrink-0"
+          />
           <div
+            v-else
             class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
             :class="avatarColor(authStore.user?.id ?? 0)"
           >
@@ -58,7 +64,13 @@
                 :class="i === mentionIndex ? 'bg-neutral-700 text-white' : 'text-neutral-300 hover:bg-neutral-700'"
                 @mousedown.prevent="insertMention(u)"
               >
+                <img
+                  v-if="u.avatar"
+                  :src="u.avatar"
+                  class="w-7 h-7 rounded-full object-cover shrink-0"
+                />
                 <div
+                  v-else
                   class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
                   :class="avatarColor(u.id)"
                 >
@@ -121,7 +133,7 @@ const loading = ref(false)
 const error = ref('')
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
-interface MentionUser { id: number; name: string }
+interface MentionUser { id: number; name: string; avatar: string | null }
 const mentionOpen = ref(false)
 const mentionUsers = ref<MentionUser[]>([])
 const mentionIndex = ref(0)
