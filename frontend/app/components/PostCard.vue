@@ -4,18 +4,7 @@
       class="shrink-0"
       @click="navigateTo(`/profile/${post.user.id}`)"
     >
-      <img
-        v-if="post.user.avatar"
-        :src="post.user.avatar"
-        class="w-10 h-10 rounded-full object-cover"
-      />
-      <div
-        v-else
-        class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-        :class="avatarColor(post.user.id)"
-      >
-        {{ initials(post.user.name) }}
-      </div>
+      <AppAvatar :user-id="post.user.id" :name="post.user.name" :avatar="post.user.avatar" />
     </button>
 
     <div class="flex-1 min-w-0">
@@ -27,7 +16,7 @@
           {{ post.user.name }}
         </button>
         <div class="flex items-center gap-2 shrink-0">
-          <span class="text-xs text-neutral-500">{{ timeAgo }}</span>
+          <span class="text-xs text-neutral-500">{{ timeAgo(post.created_at) }}</span>
           <button
             v-if="isOwn"
             class="text-neutral-600 hover:text-red-500 transition p-1 rounded-lg hover:bg-neutral-800"
@@ -89,13 +78,14 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { Heart, MessageCircle, Repeat2, Send, Trash2 } from 'lucide-vue-next'
+import { useAuthStore } from '~/stores/auth'
+import { timeAgo } from '~/utils/timeAgo'
+import type { Post } from '~/types'
 
 function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
-import { Heart, MessageCircle, Repeat2, Send, Trash2 } from 'lucide-vue-next'
-import { useAuthStore } from '~/stores/auth'
-import type { Post } from '~/types'
 
 const props = defineProps<{ post: Post }>()
 const emit = defineEmits<{ like: [id: number]; repost: [id: number]; delete: [id: number] }>()
@@ -112,47 +102,7 @@ const renderedBody = computed(() =>
   )
 )
 
-const timeAgo = computed(() => {
-  const diff = Date.now() - new Date(props.post.created_at).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'now'
-  if (mins < 60) return `${mins}m`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h`
-  return `${Math.floor(hours / 24)}d`
-})
-
-const avatarColors = [
-  'bg-violet-600',
-  'bg-blue-600',
-  'bg-emerald-600',
-  'bg-amber-600',
-  'bg-rose-600',
-  'bg-cyan-600',
-]
-
-function avatarColor(id: number): string {
-  return avatarColors[id % 6]
-}
-
-function initials(name: string): string {
-  return name
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .substring(0, 2)
-    .toUpperCase()
-}
-
-function handleLike() {
-  emit('like', props.post.id)
-}
-
-function handleRepost() {
-  emit('repost', props.post.id)
-}
-
-function handleDelete() {
-  emit('delete', props.post.id)
-}
+function handleLike() { emit('like', props.post.id) }
+function handleRepost() { emit('repost', props.post.id) }
+function handleDelete() { emit('delete', props.post.id) }
 </script>
