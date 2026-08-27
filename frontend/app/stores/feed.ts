@@ -1,18 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { User } from '~/stores/auth'
+import type { Post } from '~/types'
 
-export interface Post {
-  id: number
-  body: string
-  likes_count: number
-  replies_count: number
-  reposts_count: number
-  liked: boolean
-  reposted: boolean
-  created_at: string
-  user: User
-}
+export type { Post }
 
 export const useFeedStore = defineStore('feed', () => {
   const items = ref<Post[]>([])

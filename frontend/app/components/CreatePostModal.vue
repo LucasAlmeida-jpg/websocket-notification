@@ -27,18 +27,11 @@
         </div>
 
         <div class="flex gap-3">
-          <img
-            v-if="authStore.user?.avatar"
-            :src="authStore.user.avatar"
-            class="w-10 h-10 rounded-full object-cover shrink-0"
+          <AppAvatar
+            :user-id="authStore.user?.id ?? 0"
+            :name="authStore.user?.name ?? ''"
+            :avatar="authStore.user?.avatar ?? null"
           />
-          <div
-            v-else
-            class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-            :class="avatarColor(authStore.user?.id ?? 0)"
-          >
-            {{ initials(authStore.user?.name ?? '') }}
-          </div>
           <div class="flex-1 relative">
             <textarea
               ref="textareaRef"
@@ -64,18 +57,7 @@
                 :class="i === mentionIndex ? 'bg-neutral-700 text-white' : 'text-neutral-300 hover:bg-neutral-700'"
                 @mousedown.prevent="insertMention(u)"
               >
-                <img
-                  v-if="u.avatar"
-                  :src="u.avatar"
-                  class="w-7 h-7 rounded-full object-cover shrink-0"
-                />
-                <div
-                  v-else
-                  class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-                  :class="avatarColor(u.id)"
-                >
-                  {{ initials(u.name) }}
-                </div>
+                <AppAvatar :user-id="u.id" :name="u.name" :avatar="u.avatar" size="sm" />
                 {{ u.name }}
               </button>
             </div>
@@ -113,7 +95,7 @@ import { ref, watch, nextTick } from 'vue'
 import { X, Loader2, CircleX } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useApi } from '~/composables/useApi'
-import type { Post } from '~/stores/feed'
+import type { Post } from '~/types'
 
 const props = defineProps<{
   modelValue: boolean
@@ -133,35 +115,14 @@ const loading = ref(false)
 const error = ref('')
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
-interface MentionUser { id: number; name: string; avatar: string | null }
+import type { User } from '~/types'
+type MentionUser = User
 const mentionOpen = ref(false)
 const mentionUsers = ref<MentionUser[]>([])
 const mentionIndex = ref(0)
 const mentionStart = ref(-1)
 
 let mentionTimer: ReturnType<typeof setTimeout> | null = null
-
-const avatarColors = [
-  'bg-violet-600',
-  'bg-blue-600',
-  'bg-emerald-600',
-  'bg-amber-600',
-  'bg-rose-600',
-  'bg-cyan-600',
-]
-
-function avatarColor(id: number): string {
-  return avatarColors[id % 6]
-}
-
-function initials(name: string): string {
-  return name
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .substring(0, 2)
-    .toUpperCase()
-}
 
 function getMentionQuery(): string | null {
   const el = textareaRef.value

@@ -14,6 +14,8 @@ class PushSubscription extends Model
         'content_encoding',
     ];
 
+    protected $hidden = ['public_key', 'auth_token'];
+
     public function user()
     {
         return $this->belongsTo(User::class);

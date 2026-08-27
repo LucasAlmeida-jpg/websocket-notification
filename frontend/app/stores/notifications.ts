@@ -1,22 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import type { Notification, NotificationData } from '~/types'
 
-export interface NotificationData {
-  type: string
-  message: string
-  actor_id: number
-  actor_name: string
-  resource_type: string | null
-  resource_id: number | null
-}
-
-export interface Notification {
-  id: string
-  type: string
-  data: NotificationData
-  read_at: string | null
-  created_at: string
-}
+export type { Notification, NotificationData }
 
 export const useNotificationStore = defineStore('notifications', () => {
   const items = ref<Notification[]>([])
@@ -28,7 +14,6 @@ export const useNotificationStore = defineStore('notifications', () => {
   function pushRealtime(notif: NotificationData) {
     const fake: Notification = {
       id: crypto.randomUUID(),
-      type: 'App\\Notifications\\SocialNotification',
       data: notif,
       read_at: null,
       created_at: new Date().toISOString(),

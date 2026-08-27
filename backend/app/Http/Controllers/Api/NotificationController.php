@@ -14,9 +14,26 @@ class NotificationController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        return response()->json(
-            $request->user()->notifications()->latest()->paginate(20)
-        );
+        $paginator = $request->user()->notifications()->latest()->paginate(20);
+
+        return response()->json([
+            'data'         => collect($paginator->items())->map(fn($n) => [
+                'id'         => $n->id,
+                'data'       => [
+                    'type'          => $n->data['type'] ?? null,
+                    'message'       => $n->data['message'] ?? null,
+                    'actor_id'      => $n->data['actor_id'] ?? null,
+                    'actor_name'    => $n->data['actor_name'] ?? null,
+                    'resource_type' => $n->data['resource_type'] ?? null,
+                    'resource_id'   => $n->data['resource_id'] ?? null,
+                ],
+                'read_at'    => $n->read_at,
+                'created_at' => $n->created_at,
+            ]),
+            'current_page' => $paginator->currentPage(),
+            'last_page'    => $paginator->lastPage(),
+            'total'        => $paginator->total(),
+        ]);
     }
 
     public function unreadCount(Request $request): JsonResponse
