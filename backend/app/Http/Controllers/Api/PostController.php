@@ -70,8 +70,8 @@ class PostController extends Controller
         return [
             'id'            => $post->id,
             'body'          => $post->body,
-            'likes_count'   => $post->likes_count,
-            'replies_count' => $post->replies_count,
+            'likes_count'   => (int) ($post->likes_count ?? 0),
+            'replies_count' => (int) ($post->replies_count ?? 0),
             'liked'         => $viewer ? $post->isLikedBy($viewer) : false,
             'created_at'    => $post->created_at->toIso8601String(),
             'user'          => [
