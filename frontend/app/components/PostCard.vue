@@ -4,7 +4,13 @@
       class="shrink-0"
       @click="navigateTo(`/profile/${post.user.id}`)"
     >
+      <img
+        v-if="post.user.avatar"
+        :src="post.user.avatar"
+        class="w-10 h-10 rounded-full object-cover"
+      />
       <div
+        v-else
         class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
         :class="avatarColor(post.user.id)"
       >
