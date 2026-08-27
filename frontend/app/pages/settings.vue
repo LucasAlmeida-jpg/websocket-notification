@@ -1,80 +1,67 @@
 <template>
-  <div class="min-h-screen bg-[#0d0d0d]">
-    <AppSidebar @create-post="() => {}" />
+  <AppLayout>
+    <h1 class="text-lg font-semibold text-white mb-6">Edit Profile</h1>
 
-    <main class="md:ml-64 flex justify-center px-4 py-6 pb-24 md:pb-6">
-      <div class="w-full max-w-xl">
-        <h1 class="text-lg font-semibold text-white mb-6">Edit Profile</h1>
+    <div class="bg-[#181818] border border-neutral-800 rounded-2xl p-6 flex flex-col gap-6">
 
-        <div class="bg-[#181818] border border-neutral-800 rounded-2xl p-6 flex flex-col gap-6">
-
-          <div class="flex flex-col items-center gap-3">
-            <button class="relative group" @click="pickAvatar">
-              <div
-                v-if="preview"
-                class="w-20 h-20 rounded-full overflow-hidden"
-              >
-                <img :src="preview" class="w-full h-full object-cover" />
-              </div>
-              <div
-                v-else
-                class="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold text-white"
-                :class="avatarColor(authStore.user?.id ?? 0)"
-              >
-                {{ initials(form.name) }}
-              </div>
-              <div class="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                <Camera class="w-6 h-6 text-white" />
-              </div>
-            </button>
-            <span class="text-xs text-neutral-500">Clique para trocar a foto</span>
-            <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFileChange" />
+      <div class="flex flex-col items-center gap-3">
+        <button class="relative group" @click="pickAvatar">
+          <AppAvatar
+            :user-id="authStore.user?.id ?? 0"
+            :name="form.name"
+            :avatar="preview"
+            size="xl"
+          />
+          <div class="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+            <Camera class="w-6 h-6 text-white" />
           </div>
-
-          <div class="flex flex-col gap-1">
-            <label class="text-xs text-neutral-400">Nome</label>
-            <input
-              v-model="form.name"
-              type="text"
-              maxlength="100"
-              class="bg-[#111] border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-white/10 focus:border-neutral-600 transition"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1">
-            <label class="text-xs text-neutral-400">Bio</label>
-            <textarea
-              v-model="form.bio"
-              rows="3"
-              maxlength="300"
-              placeholder="Conte algo sobre você…"
-              class="bg-[#111] border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 outline-none focus:ring-2 focus:ring-white/10 focus:border-neutral-600 transition resize-none"
-            />
-            <span class="text-xs text-neutral-600 text-right">{{ form.bio?.length ?? 0 }} / 300</span>
-          </div>
-
-          <p v-if="error" class="text-sm text-red-400 flex items-center gap-1.5">
-            <CircleX class="w-4 h-4 shrink-0" />
-            {{ error }}
-          </p>
-
-          <p v-if="success" class="text-sm text-emerald-400 flex items-center gap-1.5">
-            <CheckCircle class="w-4 h-4 shrink-0" />
-            Perfil atualizado!
-          </p>
-
-          <button
-            :disabled="loading || !changed"
-            class="bg-white text-black text-sm font-semibold px-6 py-3 rounded-full hover:bg-neutral-200 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            @click="save"
-          >
-            <Loader2 v-if="loading" class="w-4 h-4 animate-spin" />
-            <span>Salvar</span>
-          </button>
-        </div>
+        </button>
+        <span class="text-xs text-neutral-500">Clique para trocar a foto</span>
+        <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFileChange" />
       </div>
-    </main>
-  </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-neutral-400">Nome</label>
+        <input
+          v-model="form.name"
+          type="text"
+          maxlength="100"
+          class="bg-[#111] border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-white/10 focus:border-neutral-600 transition"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-neutral-400">Bio</label>
+        <textarea
+          v-model="form.bio"
+          rows="3"
+          maxlength="300"
+          placeholder="Conte algo sobre você…"
+          class="bg-[#111] border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 outline-none focus:ring-2 focus:ring-white/10 focus:border-neutral-600 transition resize-none"
+        />
+        <span class="text-xs text-neutral-600 text-right">{{ form.bio?.length ?? 0 }} / 300</span>
+      </div>
+
+      <p v-if="error" class="text-sm text-red-400 flex items-center gap-1.5">
+        <CircleX class="w-4 h-4 shrink-0" />
+        {{ error }}
+      </p>
+
+      <p v-if="success" class="text-sm text-emerald-400 flex items-center gap-1.5">
+        <CheckCircle class="w-4 h-4 shrink-0" />
+        Perfil atualizado!
+      </p>
+
+      <button
+        :disabled="loading || !changed"
+        class="bg-white text-black text-sm font-semibold px-6 py-3 rounded-full hover:bg-neutral-200 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        @click="save"
+      >
+        <Loader2 v-if="loading" class="w-4 h-4 animate-spin" />
+        <span>Salvar</span>
+      </button>
+    </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -97,16 +84,6 @@ const success = ref(false)
 const form = ref({ name: '', bio: '' })
 const preview = ref<string | null>(null)
 const newAvatar = ref<string | null | undefined>(undefined)
-
-const avatarColors = [
-  'bg-violet-600', 'bg-blue-600', 'bg-emerald-600',
-  'bg-amber-600', 'bg-rose-600', 'bg-cyan-600',
-]
-
-function avatarColor(id: number) { return avatarColors[id % 6] }
-function initials(name: string) {
-  return name.split(' ').map((w) => w[0]).join('').substring(0, 2).toUpperCase()
-}
 
 const changed = computed(() => {
   const u = authStore.user
