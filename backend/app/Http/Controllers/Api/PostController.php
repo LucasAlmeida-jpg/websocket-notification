@@ -68,13 +68,15 @@ class PostController extends Controller
     public static function formatPost(Post $post, ?User $viewer): array
     {
         return [
-            'id'            => $post->id,
-            'body'          => $post->body,
-            'likes_count'   => (int) ($post->likes_count ?? 0),
-            'replies_count' => (int) ($post->replies_count ?? 0),
-            'liked'         => $viewer ? $post->isLikedBy($viewer) : false,
-            'created_at'    => $post->created_at->toIso8601String(),
-            'user'          => [
+            'id'             => $post->id,
+            'body'           => $post->body,
+            'likes_count'    => (int) ($post->likes_count ?? 0),
+            'replies_count'  => (int) ($post->replies_count ?? 0),
+            'reposts_count'  => (int) ($post->reposts_count ?? 0),
+            'liked'          => $viewer ? $post->isLikedBy($viewer) : false,
+            'reposted'       => $viewer ? $post->isRepostedBy($viewer) : false,
+            'created_at'     => $post->created_at->toIso8601String(),
+            'user'           => [
                 'id'     => $post->user->id,
                 'name'   => $post->user->name,
                 'avatar' => $post->user->avatar,
