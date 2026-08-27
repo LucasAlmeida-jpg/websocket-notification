@@ -2,17 +2,11 @@
 
 namespace App\Notifications;
 
-use App\Events\NotificationCreated;
 use App\Models\User;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class SocialNotification extends Notification implements ShouldQueue
+class SocialNotification extends Notification
 {
-    use Queueable;
-
-    // Supported types: like, comment, follow, mention
     public function __construct(
         public readonly User $actor,
         public readonly string $type,
@@ -36,10 +30,5 @@ class SocialNotification extends Notification implements ShouldQueue
             'resource_type' => $this->resourceType,
             'resource_id'   => $this->resourceId,
         ];
-    }
-
-    public function afterCommit(): bool
-    {
-        return true;
     }
 }
