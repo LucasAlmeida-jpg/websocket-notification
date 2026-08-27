@@ -78,14 +78,17 @@ interface User {
   id: number
   name: string
   avatar: string | null
+  bio: string | null
+  is_following: boolean
 }
 
-const { get } = useApi()
+const { get, post } = useApi()
 
 const query = ref('')
 const results = ref<User[]>([])
 const loading = ref(false)
 const showCreateModal = ref(false)
+const followingInProgress = ref(new Set<number>())
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -123,5 +126,20 @@ function onInput() {
       loading.value = false
     }
   }, 350)
+}
+
+async function toggleFollow(user: User) {
+  if (followingInProgress.value.has(user.id)) return
+  followingInProgress.value = new Set(followingInProgress.value).add(user.id)
+  try {
+    const res = await post<{ following: boolean }>(`/api/users/${user.id}/follow`, {})
+    const found = results.value.find((u) => u.id === user.id)
+    if (found) found.is_following = res.following
+  } catch {
+  } finally {
+    const next = new Set(followingInProgress.value)
+    next.delete(user.id)
+    followingInProgress.value = next
+  }
 }
 </script>
