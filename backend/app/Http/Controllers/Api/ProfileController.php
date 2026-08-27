@@ -39,12 +39,25 @@ class ProfileController extends Controller
 
     public function search(Request $request): JsonResponse
     {
-        $q = $request->validate(['q' => 'required|string|min:1'])['q'];
+        $q      = $request->validate(['q' => 'required|string|min:1'])['q'];
+        $viewer = $request->user();
 
-        $users = User::where('name', 'like', "%{$q}%")
-            ->orWhere('email', 'like', "%{$q}%")
+        $followingIds = $viewer->following()->pluck('following_id')->toArray();
+
+        $users = User::where(fn($query) =>
+                $query->where('name', 'like', "%{$q}%")
+                      ->orWhere('email', 'like', "%{$q}%")
+            )
+            ->where('id', '!=', $viewer->id)
             ->limit(10)
-            ->get(['id', 'name', 'avatar', 'bio']);
+            ->get(['id', 'name', 'avatar', 'bio'])
+            ->map(fn($u) => [
+                'id'           => $u->id,
+                'name'         => $u->name,
+                'avatar'       => $u->avatar,
+                'bio'          => $u->bio,
+                'is_following' => in_array($u->id, $followingIds),
+            ]);
 
         return response()->json($users);
     }
