@@ -22,7 +22,10 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  routeRules: {
-    '/api/**': { proxy: process.env.NUXT_PUBLIC_API_BASE ?? 'http://localhost:8080/api/**' },
+  nitro: {
+    devProxy: {
+      '/api': { target: 'http://localhost:8080/api', changeOrigin: true, prependPath: true },
+      '/broadcasting': { target: 'http://localhost:8080/broadcasting', changeOrigin: true, prependPath: true },
+    },
   },
 })

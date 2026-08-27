@@ -1,7 +1,6 @@
 import { useAuthStore } from '~/stores/auth'
 
 export function useApi() {
-  const config = useRuntimeConfig()
   const authStore = useAuthStore()
 
   async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -12,7 +11,7 @@ export function useApi() {
       ...((options.headers as Record<string, string>) ?? {}),
     }
 
-    const res = await fetch(`${config.public.apiBase}${path}`, {
+    const res = await fetch(path, {
       ...options,
       headers,
     })
