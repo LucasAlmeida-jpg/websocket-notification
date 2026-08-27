@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export interface NotificationData {
-  type: 'like' | 'comment' | 'follow' | 'mention'
+  type: string
   message: string
   actor_id: number
   actor_name: string

@@ -4,7 +4,7 @@ import { ref, computed } from 'vue'
 export interface User {
   id: number
   name: string
-  email: string
+  avatar: string | null
 }
 
 export const useAuthStore = defineStore('auth', () => {

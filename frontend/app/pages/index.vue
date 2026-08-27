@@ -1,152 +1,133 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <header class="bg-white border-b border-gray-100 sticky top-0 z-10">
-      <div class="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <Bell class="w-5 h-5 text-gray-900" />
-          <span class="font-semibold text-gray-900">Notificações</span>
-          <span
-            v-if="notifStore.unreadCount > 0"
-            class="bg-gray-900 text-white text-xs font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center"
-          >
-            {{ notifStore.unreadCount }}
-          </span>
-        </div>
+  <div class="min-h-screen bg-[#0d0d0d]">
+    <AppSidebar @create-post="showCreateModal = true" />
 
-        <div class="flex items-center gap-2">
+    <main class="md:ml-64 flex justify-center px-4 py-6 pb-24 md:pb-6">
+      <div class="w-full max-w-xl">
+        <div class="hidden md:flex items-center justify-between mb-6">
+          <h1 class="text-lg font-semibold text-white">Feed</h1>
           <button
-            v-if="notifStore.unreadCount > 0"
-            class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition px-3 py-1.5 rounded-lg hover:bg-gray-50"
-            @click="markAllRead"
+            class="flex items-center gap-2 bg-white text-black text-sm font-semibold px-4 py-2 rounded-full hover:bg-neutral-200 transition"
+            @click="showCreateModal = true"
           >
-            <CheckCheck class="w-4 h-4" />
-            Marcar todas
-          </button>
-
-          <button
-            class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition px-3 py-1.5 rounded-lg hover:bg-red-50"
-            @click="doLogout"
-          >
-            <LogOut class="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <main class="max-w-2xl mx-auto px-4 py-6 flex flex-col gap-4">
-      <SendNotificationCard />
-
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
-          <span class="text-sm font-medium text-gray-900">Feed</span>
-          <button
-            class="text-gray-400 hover:text-gray-700 transition"
-            :class="{ 'animate-spin': notifStore.loading }"
-            @click="fetchNotifications(1)"
-          >
-            <RefreshCw class="w-4 h-4" />
+            <Pencil class="w-4 h-4" />
+            New Thread
           </button>
         </div>
 
-        <div v-if="notifStore.loading && notifStore.items.length === 0" class="flex items-center justify-center py-16">
-          <Loader2 class="w-5 h-5 animate-spin text-gray-400" />
+        <div v-if="feedStore.loading && feedStore.items.length === 0" class="flex justify-center py-16">
+          <Loader2 class="w-6 h-6 animate-spin text-neutral-500" />
         </div>
 
-        <div v-else-if="notifStore.items.length === 0" class="flex flex-col items-center justify-center py-16 gap-2 text-gray-400">
-          <BellOff class="w-8 h-8" />
-          <p class="text-sm">Nenhuma notificação ainda</p>
+        <div
+          v-else-if="feedStore.items.length === 0"
+          class="flex flex-col items-center justify-center py-16 gap-3 text-neutral-500"
+        >
+          <MessageCircle class="w-10 h-10" />
+          <p class="text-sm">No threads yet. Start the conversation!</p>
         </div>
 
-        <ul v-else class="divide-y divide-gray-50">
-          <NotificationItem
-            v-for="notif in notifStore.items"
-            :key="notif.id"
-            :notification="notif"
-            @mark-read="markRead"
-            @remove="remove"
+        <div v-else class="flex flex-col gap-3">
+          <PostCard
+            v-for="post in feedStore.items"
+            :key="post.id"
+            :post="post"
+            @like="handleLike"
+            @delete="handleDelete"
           />
-        </ul>
 
-        <div v-if="notifStore.currentPage < notifStore.lastPage" class="px-5 py-4 border-t border-gray-50">
-          <button
-            class="w-full text-sm text-gray-500 hover:text-gray-900 transition flex items-center justify-center gap-2"
-            :disabled="notifStore.loading"
-            @click="fetchNotifications(notifStore.currentPage + 1)"
-          >
-            <Loader2 v-if="notifStore.loading" class="w-4 h-4 animate-spin" />
-            <span>Carregar mais</span>
-          </button>
+          <div v-if="feedStore.currentPage < feedStore.lastPage" class="flex justify-center pt-2">
+            <button
+              :disabled="feedStore.loading"
+              class="text-sm text-neutral-400 hover:text-white transition flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-700 hover:border-neutral-500"
+              @click="loadMore"
+            >
+              <Loader2 v-if="feedStore.loading" class="w-4 h-4 animate-spin" />
+              <span>Load more</span>
+            </button>
+          </div>
         </div>
       </div>
     </main>
+
+    <button
+      class="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-white text-black rounded-full flex items-center justify-center shadow-lg hover:bg-neutral-200 transition z-10"
+      @click="showCreateModal = true"
+    >
+      <Pencil class="w-6 h-6" />
+    </button>
+
+    <CreatePostModal
+      v-model="showCreateModal"
+      @posted="onPosted"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
-import { Bell, BellOff, CheckCheck, LogOut, RefreshCw, Loader2 } from 'lucide-vue-next'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { Pencil, Loader2, MessageCircle } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useNotificationStore } from '~/stores/notifications'
-import type { Notification } from '~/stores/notifications'
+import { useFeedStore } from '~/stores/feed'
+import type { Post } from '~/stores/feed'
 import { useApi } from '~/composables/useApi'
 
 definePageMeta({ middleware: ['auth'] })
 
 const authStore = useAuthStore()
 const notifStore = useNotificationStore()
-const { get, patch, del } = useApi()
-const router = useRouter()
+const feedStore = useFeedStore()
+const { get, post: apiPost, del } = useApi()
 const { $pusher } = useNuxtApp()
 
-interface PaginatedResponse {
-  data: Notification[]
+const showCreateModal = ref(false)
+
+interface FeedResponse {
+  data: Post[]
   current_page: number
   last_page: number
 }
 
-async function fetchNotifications(page = 1) {
-  notifStore.loading = true
+async function fetchFeed(page = 1) {
+  feedStore.loading = true
   try {
-    const res = await get<PaginatedResponse>(`/api/notifications?page=${page}`)
-    notifStore.setItems(res.data, res.current_page, res.last_page)
-    if (page === 1) {
-      const counts = await get<{ count: number }>('/api/notifications/unread-count')
-      notifStore.unreadCount = counts.count
-    }
+    const res = await get<FeedResponse>(`/api/feed?page=${page}`)
+    feedStore.setItems(res.data, res.current_page, res.last_page)
   } finally {
-    notifStore.loading = false
+    feedStore.loading = false
   }
+}
+
+async function loadMore() {
+  if (feedStore.currentPage < feedStore.lastPage) {
+    await fetchFeed(feedStore.currentPage + 1)
+  }
+}
+
+async function handleLike(id: number) {
+  try {
+    const res = await apiPost<{ liked: boolean; likes_count: number }>(`/api/posts/${id}/like`, {})
+    feedStore.toggleLike(id, res.liked, res.likes_count)
+  } catch {}
+}
+
+async function handleDelete(id: number) {
+  try {
+    await del(`/api/posts/${id}`)
+    feedStore.removePost(id)
+  } catch {}
+}
+
+function onPosted(post: Post) {
+  feedStore.prependPost(post)
 }
 
 async function pollUnread() {
   try {
     const { count } = await get<{ count: number }>('/api/notifications/unread-count')
-    if (count !== notifStore.unreadCount) {
-      await fetchNotifications(1)
-    }
+    notifStore.unreadCount = count
   } catch {}
-}
-
-async function markRead(id: string) {
-  notifStore.markRead(id)
-  await patch(`/api/notifications/${id}/read`).catch(() => {})
-}
-
-async function markAllRead() {
-  notifStore.markAllRead()
-  await patch('/api/notifications/read-all').catch(() => {})
-}
-
-async function remove(id: string) {
-  notifStore.remove(id)
-  await del(`/api/notifications/${id}`).catch(() => {})
-}
-
-async function doLogout() {
-  await get('/api/logout').catch(() => {})
-  $pusher.disconnect()
-  authStore.logout()
-  router.push('/login')
 }
 
 let pollInterval: ReturnType<typeof setInterval> | null = null
@@ -154,7 +135,7 @@ let pollInterval: ReturnType<typeof setInterval> | null = null
 onMounted(async () => {
   authStore.restoreFromStorage()
   if (!authStore.isAuthenticated) return
-  await fetchNotifications(1)
+  await fetchFeed(1)
   if (authStore.user) $pusher.connect(authStore.user.id)
   pollInterval = setInterval(pollUnread, 5000)
 })

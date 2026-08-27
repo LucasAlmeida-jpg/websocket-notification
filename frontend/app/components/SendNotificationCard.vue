@@ -1,46 +1,46 @@
 <template>
-  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+  <div class="bg-[#181818] border border-neutral-800 rounded-2xl p-5">
     <div class="flex items-center gap-2 mb-4">
-      <Send class="w-4 h-4 text-gray-500" />
-      <h2 class="text-sm font-medium text-gray-900">Enviar notificação de teste</h2>
+      <Send class="w-4 h-4 text-neutral-400" />
+      <h2 class="text-sm font-medium text-white">Send test notification</h2>
     </div>
 
     <form class="flex flex-col gap-3" @submit.prevent="submit">
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">Destinatário (user ID)</label>
+          <label class="block text-xs font-medium text-neutral-400 mb-1">Recipient (user ID)</label>
           <input
             v-model.number="form.recipient_id"
             type="number"
             min="1"
             required
-            placeholder="ex: 2"
-            class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition"
+            placeholder="e.g. 2"
+            class="w-full rounded-lg border border-neutral-700 bg-neutral-900 text-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-white/20 focus:border-neutral-600 transition placeholder-neutral-600"
           />
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">Tipo</label>
+          <label class="block text-xs font-medium text-neutral-400 mb-1">Type</label>
           <select
             v-model="form.type"
-            class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition bg-white"
+            class="w-full rounded-lg border border-neutral-700 bg-neutral-900 text-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-white/20 focus:border-neutral-600 transition"
           >
-            <option value="like">❤️ like</option>
-            <option value="comment">💬 comment</option>
-            <option value="follow">👤 follow</option>
-            <option value="mention">📣 mention</option>
+            <option value="like">like</option>
+            <option value="comment">comment</option>
+            <option value="follow">follow</option>
+            <option value="mention">mention</option>
           </select>
         </div>
       </div>
 
       <div>
-        <label class="block text-xs font-medium text-gray-600 mb-1">Mensagem</label>
+        <label class="block text-xs font-medium text-neutral-400 mb-1">Message</label>
         <input
           v-model="form.message"
           type="text"
           required
-          placeholder="ex: curtiu sua foto"
-          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition"
+          placeholder="e.g. liked your post"
+          class="w-full rounded-lg border border-neutral-700 bg-neutral-900 text-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-white/20 focus:border-neutral-600 transition placeholder-neutral-600"
         />
       </div>
 
@@ -48,18 +48,18 @@
         <button
           type="submit"
           :disabled="loading"
-          class="flex items-center gap-2 bg-gray-900 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex items-center gap-2 bg-white text-black rounded-lg px-4 py-2 text-sm font-semibold hover:bg-neutral-200 transition disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Loader2 v-if="loading" class="w-4 h-4 animate-spin" />
           <Send v-else class="w-4 h-4" />
-          Enviar
+          Send
         </button>
 
-        <p v-if="success" class="flex items-center gap-1.5 text-sm text-emerald-600">
+        <p v-if="success" class="flex items-center gap-1.5 text-sm text-emerald-400">
           <CircleCheck class="w-4 h-4" />
-          Enviado!
+          Sent!
         </p>
-        <p v-if="error" class="flex items-center gap-1.5 text-sm text-red-500">
+        <p v-if="error" class="flex items-center gap-1.5 text-sm text-red-400">
           <CircleX class="w-4 h-4" />
           {{ error }}
         </p>
@@ -95,7 +95,7 @@ async function submit() {
     form.message = ''
     setTimeout(() => { success.value = false }, 3000)
   } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : 'Erro ao enviar'
+    error.value = e instanceof Error ? e.message : 'Failed to send'
   } finally {
     loading.value = false
   }

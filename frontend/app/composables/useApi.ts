@@ -27,7 +27,8 @@ export function useApi() {
   const get = <T>(path: string) => request<T>(path)
   const post = <T>(path: string, body: unknown) =>
     request<T>(path, { method: 'POST', body: JSON.stringify(body) })
-  const patch = <T>(path: string) => request<T>(path, { method: 'PATCH' })
+  const patch = <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: 'PATCH', ...(body ? { body: JSON.stringify(body) } : {}) })
   const del = <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'DELETE', ...(body ? { body: JSON.stringify(body) } : {}) })
 
