@@ -1,7 +1,7 @@
 import Pusher from 'pusher-js'
 import { useAuthStore } from '~/stores/auth'
 import { useNotificationStore } from '~/stores/notifications'
-import type { NotificationData } from '~/stores/notifications'
+import type { NotificationData } from '~/types'
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig()
