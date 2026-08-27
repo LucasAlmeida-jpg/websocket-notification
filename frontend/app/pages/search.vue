@@ -27,20 +27,35 @@
         </div>
 
         <div v-else class="flex flex-col gap-2">
-          <NuxtLink
+          <div
             v-for="user in results"
             :key="user.id"
-            :to="`/profile/${user.id}`"
-            class="flex items-center gap-3 px-4 py-3 bg-[#181818] border border-neutral-800 rounded-2xl hover:border-neutral-600 transition"
+            class="flex items-center gap-3 px-4 py-3 bg-[#181818] border border-neutral-800 rounded-2xl"
           >
-            <div
-              class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-              :class="avatarColor(user.id)"
+            <NuxtLink :to="`/profile/${user.id}`" class="flex items-center gap-3 flex-1 min-w-0">
+              <div
+                class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
+                :class="avatarColor(user.id)"
+              >
+                {{ initials(user.name) }}
+              </div>
+              <div class="min-w-0">
+                <p class="text-sm font-medium text-white truncate">{{ user.name }}</p>
+                <p v-if="user.bio" class="text-xs text-neutral-500 truncate">{{ user.bio }}</p>
+              </div>
+            </NuxtLink>
+
+            <button
+              class="shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition"
+              :class="user.is_following
+                ? 'border border-neutral-600 text-white hover:bg-neutral-800'
+                : 'bg-white text-black hover:bg-neutral-200'"
+              :disabled="followingInProgress.has(user.id)"
+              @click="toggleFollow(user)"
             >
-              {{ initials(user.name) }}
-            </div>
-            <span class="text-sm font-medium text-white">{{ user.name }}</span>
-          </NuxtLink>
+              {{ user.is_following ? 'Following' : 'Follow' }}
+            </button>
+          </div>
         </div>
       </div>
     </main>
