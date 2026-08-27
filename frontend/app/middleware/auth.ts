@@ -1,8 +1,9 @@
 import { useAuthStore } from '~/stores/auth'
 
 export default defineNuxtRouteMiddleware(() => {
+  if (import.meta.server) return
+
   const authStore = useAuthStore()
-  authStore.restoreFromStorage()
 
   if (!authStore.isAuthenticated) {
     return navigateTo('/login')
