@@ -19,7 +19,7 @@
           <span class="font-semibold">{{ notification.data.actor_name }}</span>
           {{ ' ' }}{{ bodyText }}
         </p>
-        <p class="text-xs text-neutral-500 mt-1">{{ timeAgo }}</p>
+        <p class="text-xs text-neutral-500 mt-1">{{ timeAgo(notification.created_at, 'long') }}</p>
       </div>
     </button>
 
@@ -44,6 +44,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Check, Trash2, Heart, MessageCircle, UserPlus, AtSign, Bell, Repeat2, Send } from 'lucide-vue-next'
+import { timeAgo } from '~/utils/timeAgo'
 import type { Notification } from '~/types'
 
 const props = defineProps<{ notification: Notification }>()
@@ -71,16 +72,6 @@ const destination = computed(() => {
   if (type === 'follow') return `/profile/${actor_id}`
   if (resource_type === 'post' && resource_id) return `/post/${resource_id}`
   return null
-})
-
-const timeAgo = computed(() => {
-  const diff = Date.now() - new Date(props.notification.created_at).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
 })
 
 function handleClick() {
