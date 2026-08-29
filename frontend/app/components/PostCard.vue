@@ -30,8 +30,12 @@
       <button
         class="text-neutral-200 text-sm mt-1 text-left w-full leading-relaxed hover:text-white transition"
         @click="navigateTo(`/post/${post.id}`)"
-        v-html="renderedBody"
-      />
+      >
+        <template v-for="(seg, i) in bodySegments" :key="i">
+          <span v-if="seg.type === 'mention'" class="text-blue-400 font-medium">@{{ seg.value }}</span>
+          <template v-else>{{ seg.value }}</template>
+        </template>
+      </button>
 
       <div class="flex items-center gap-4 mt-3">
         <button
@@ -83,10 +87,6 @@ import { useAuthStore } from '~/stores/auth'
 import { timeAgo } from '~/utils/timeAgo'
 import type { Post } from '~/types'
 
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-}
-
 const props = defineProps<{ post: Post }>()
 const emit = defineEmits<{ like: [id: number]; repost: [id: number]; delete: [id: number] }>()
 
@@ -95,12 +95,19 @@ const showShare = ref(false)
 
 const isOwn = computed(() => authStore.user?.id === props.post.user.id)
 
-const renderedBody = computed(() =>
-  escapeHtml(props.post.body).replace(
-    /@(\w+)/g,
-    '<span class="text-blue-400 font-medium">@$1</span>',
-  )
-)
+const bodySegments = computed(() => {
+  const parts: Array<{ type: 'text' | 'mention'; value: string }> = []
+  const regex = /@(\w+)/g
+  let last = 0
+  let match
+  while ((match = regex.exec(props.post.body)) !== null) {
+    if (match.index > last) parts.push({ type: 'text', value: props.post.body.slice(last, match.index) })
+    parts.push({ type: 'mention', value: match[1] })
+    last = regex.lastIndex
+  }
+  if (last < props.post.body.length) parts.push({ type: 'text', value: props.post.body.slice(last) })
+  return parts
+})
 
 function handleLike() { emit('like', props.post.id) }
 function handleRepost() { emit('repost', props.post.id) }
