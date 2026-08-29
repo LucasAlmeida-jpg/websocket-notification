@@ -81,6 +81,7 @@ import { ref, onMounted } from 'vue'
 import { ArrowLeft, User as UserIcon, MessageCircle } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useApi } from '~/composables/useApi'
+import { useErrorToast } from '~/composables/useErrorToast'
 import type { Post } from '~/types'
 
 definePageMeta({ middleware: ['auth'] })
@@ -99,6 +100,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const { get, post: apiPost, del } = useApi()
+const { showError } = useErrorToast()
 
 const profile = ref<UserProfile | null>(null)
 const posts = ref<Post[]>([])
@@ -147,38 +149,65 @@ async function loadMorePosts() {
 
 async function handleFollow() {
   if (!profile.value) return
+  const snapshot = { is_following: profile.value.is_following, followers_count: profile.value.followers_count }
+  profile.value.is_following = !snapshot.is_following
+  profile.value.followers_count = snapshot.is_following
+    ? Math.max(0, snapshot.followers_count - 1)
+    : snapshot.followers_count + 1
   try {
     const res = await apiPost<{ following: boolean }>(`/api/users/${profile.value.id}/follow`, {})
     profile.value.is_following = res.following
-    if (res.following) {
-      profile.value.followers_count++
-    } else {
-      profile.value.followers_count = Math.max(0, profile.value.followers_count - 1)
-    }
-  } catch {}
+    profile.value.followers_count = res.following
+      ? snapshot.followers_count + 1
+      : Math.max(0, snapshot.followers_count - 1)
+  } catch {
+    profile.value.is_following = snapshot.is_following
+    profile.value.followers_count = snapshot.followers_count
+    showError('Não foi possível seguir o usuário. Tente novamente.')
+  }
 }
 
 async function handleLike(id: number) {
+  const p = posts.value.find((x) => x.id === id)
+  if (!p) return
+  const snapshot = { liked: p.liked, likes_count: p.likes_count }
+  p.liked = !snapshot.liked
+  p.likes_count = snapshot.liked ? snapshot.likes_count - 1 : snapshot.likes_count + 1
   try {
     const res = await apiPost<{ liked: boolean; likes_count: number }>(`/api/posts/${id}/like`, {})
-    const p = posts.value.find((x) => x.id === id)
-    if (p) { p.liked = res.liked; p.likes_count = res.likes_count }
-  } catch {}
+    p.liked = res.liked
+    p.likes_count = res.likes_count
+  } catch {
+    p.liked = snapshot.liked
+    p.likes_count = snapshot.likes_count
+    showError('Não foi possível curtir o post. Tente novamente.')
+  }
 }
 
 async function handleRepost(id: number) {
+  const p = posts.value.find((x) => x.id === id)
+  if (!p) return
+  const snapshot = { reposted: p.reposted, reposts_count: p.reposts_count }
+  p.reposted = !snapshot.reposted
+  p.reposts_count = snapshot.reposted ? snapshot.reposts_count - 1 : snapshot.reposts_count + 1
   try {
     const res = await apiPost<{ reposted: boolean; reposts_count: number }>(`/api/posts/${id}/repost`, {})
-    const p = posts.value.find((x) => x.id === id)
-    if (p) { p.reposted = res.reposted; p.reposts_count = res.reposts_count }
-  } catch {}
+    p.reposted = res.reposted
+    p.reposts_count = res.reposts_count
+  } catch {
+    p.reposted = snapshot.reposted
+    p.reposts_count = snapshot.reposts_count
+    showError('Não foi possível repostar. Tente novamente.')
+  }
 }
 
 async function handlePostDelete(id: number) {
   try {
     await del(`/api/posts/${id}`)
     posts.value = posts.value.filter((p) => p.id !== id)
-  } catch {}
+  } catch {
+    showError('Não foi possível deletar o post. Tente novamente.')
+  }
 }
 
 function onPosted(post: Post) {

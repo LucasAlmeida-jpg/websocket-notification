@@ -54,6 +54,7 @@ import { useNotificationStore } from '~/stores/notifications'
 import { useFeedStore } from '~/stores/feed'
 import type { Post } from '~/types'
 import { useApi } from '~/composables/useApi'
+import { useErrorToast } from '~/composables/useErrorToast'
 
 definePageMeta({ middleware: ['auth'] })
 
@@ -61,6 +62,7 @@ const authStore = useAuthStore()
 const notifStore = useNotificationStore()
 const feedStore = useFeedStore()
 const { get, post: apiPost, del } = useApi()
+const { showError } = useErrorToast()
 const { $pusher } = useNuxtApp()
 
 const showCreateModal = ref(false)
@@ -88,24 +90,40 @@ async function loadMore() {
 }
 
 async function handleLike(id: number) {
+  const post = feedStore.items.find((p) => p.id === id)
+  if (!post) return
+  const snapshot = { liked: post.liked, likes_count: post.likes_count }
+  feedStore.toggleLike(id, !post.liked, post.liked ? post.likes_count - 1 : post.likes_count + 1)
   try {
     const res = await apiPost<{ liked: boolean; likes_count: number }>(`/api/posts/${id}/like`, {})
     feedStore.toggleLike(id, res.liked, res.likes_count)
-  } catch {}
+  } catch {
+    feedStore.toggleLike(id, snapshot.liked, snapshot.likes_count)
+    showError('Não foi possível curtir o post. Tente novamente.')
+  }
 }
 
 async function handleRepost(id: number) {
+  const post = feedStore.items.find((p) => p.id === id)
+  if (!post) return
+  const snapshot = { reposted: post.reposted, reposts_count: post.reposts_count }
+  feedStore.toggleRepost(id, !post.reposted, post.reposted ? post.reposts_count - 1 : post.reposts_count + 1)
   try {
     const res = await apiPost<{ reposted: boolean; reposts_count: number }>(`/api/posts/${id}/repost`, {})
     feedStore.toggleRepost(id, res.reposted, res.reposts_count)
-  } catch {}
+  } catch {
+    feedStore.toggleRepost(id, snapshot.reposted, snapshot.reposts_count)
+    showError('Não foi possível repostar. Tente novamente.')
+  }
 }
 
 async function handleDelete(id: number) {
   try {
     await del(`/api/posts/${id}`)
     feedStore.removePost(id)
-  } catch {}
+  } catch {
+    showError('Não foi possível deletar o post. Tente novamente.')
+  }
 }
 
 function onPosted(post: Post) {

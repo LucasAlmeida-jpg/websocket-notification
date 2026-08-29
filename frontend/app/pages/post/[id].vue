@@ -108,6 +108,7 @@ import { ref, onMounted } from 'vue'
 import { ArrowLeft, Heart, MessageCircle, Repeat2, Send, Trash2 } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useApi } from '~/composables/useApi'
+import { useErrorToast } from '~/composables/useErrorToast'
 import { timeAgo } from '~/utils/timeAgo'
 import type { Post } from '~/types'
 
@@ -117,6 +118,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const { get, post: apiPost, del } = useApi()
+const { showError } = useErrorToast()
 
 const post = ref<Post | null>(null)
 const replies = ref<Post[]>([])
@@ -138,28 +140,45 @@ async function fetchPost() {
 }
 
 async function handleLike(id: number) {
+  if (!post.value || post.value.id !== id) return
+  const snapshot = { liked: post.value.liked, likes_count: post.value.likes_count }
+  post.value.liked = !snapshot.liked
+  post.value.likes_count = snapshot.liked ? snapshot.likes_count - 1 : snapshot.likes_count + 1
   try {
     const res = await apiPost<{ liked: boolean; likes_count: number }>(`/api/posts/${id}/like`, {})
-    if (post.value && post.value.id === id) {
-      post.value.liked = res.liked
-      post.value.likes_count = res.likes_count
-    }
-  } catch {}
+    post.value.liked = res.liked
+    post.value.likes_count = res.likes_count
+  } catch {
+    post.value.liked = snapshot.liked
+    post.value.likes_count = snapshot.likes_count
+    showError('Não foi possível curtir o post. Tente novamente.')
+  }
 }
 
 async function handleDelete(id: number) {
   try {
     await del(`/api/posts/${id}`)
     router.back()
-  } catch {}
+  } catch {
+    showError('Não foi possível deletar o post. Tente novamente.')
+  }
 }
 
 async function handleReplyLike(id: number) {
+  const reply = replies.value.find((r) => r.id === id)
+  if (!reply) return
+  const snapshot = { liked: reply.liked, likes_count: reply.likes_count }
+  reply.liked = !snapshot.liked
+  reply.likes_count = snapshot.liked ? snapshot.likes_count - 1 : snapshot.likes_count + 1
   try {
     const res = await apiPost<{ liked: boolean; likes_count: number }>(`/api/posts/${id}/like`, {})
-    const reply = replies.value.find((r) => r.id === id)
-    if (reply) { reply.liked = res.liked; reply.likes_count = res.likes_count }
-  } catch {}
+    reply.liked = res.liked
+    reply.likes_count = res.likes_count
+  } catch {
+    reply.liked = snapshot.liked
+    reply.likes_count = snapshot.likes_count
+    showError('Não foi possível curtir o post. Tente novamente.')
+  }
 }
 
 async function handleReplyDelete(id: number) {
@@ -167,7 +186,9 @@ async function handleReplyDelete(id: number) {
     await del(`/api/posts/${id}`)
     replies.value = replies.value.filter((r) => r.id !== id)
     if (post.value) post.value.replies_count = Math.max(0, post.value.replies_count - 1)
-  } catch {}
+  } catch {
+    showError('Não foi possível deletar o post. Tente novamente.')
+  }
 }
 
 function onPosted(newPost: Post) {

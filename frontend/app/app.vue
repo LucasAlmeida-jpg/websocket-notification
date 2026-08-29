@@ -21,16 +21,34 @@
         </button>
       </div>
     </Transition>
+
+    <Transition name="toast">
+      <div
+        v-if="errorMessage"
+        class="fixed bottom-6 left-6 z-50 flex items-center gap-3 rounded-xl bg-red-950 border border-red-800 px-5 py-4 text-white shadow-2xl max-w-sm w-full"
+      >
+        <AlertCircle class="w-5 h-5 shrink-0 text-red-400" />
+        <p class="text-sm flex-1">{{ errorMessage }}</p>
+        <button
+          class="text-red-400 hover:text-white transition shrink-0"
+          @click="errorMessage = null"
+        >
+          <X class="w-4 h-4" />
+        </button>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { X, Heart, MessageCircle, UserPlus, AtSign, Bell } from 'lucide-vue-next'
+import { X, Heart, MessageCircle, UserPlus, AtSign, Bell, AlertCircle } from 'lucide-vue-next'
 import { useNotificationStore } from '~/stores/notifications'
+import { useErrorToast } from '~/composables/useErrorToast'
 import type { NotificationData } from '~/types'
 
 const notifStore = useNotificationStore()
+const { errorMessage } = useErrorToast()
 const toast = ref<NotificationData | null>(null)
 
 const iconMap: Record<string, unknown> = {
