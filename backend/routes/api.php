@@ -13,10 +13,12 @@ use App\Http\Controllers\Api\MeController;
 use App\Http\Controllers\Api\ShareController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login',    [AuthController::class, 'login']);
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login',    [AuthController::class, 'login']);
+});
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::post('/logout',  [AuthController::class, 'logout']);
     Route::get('/me',       [AuthController::class, 'me']);
     Route::patch('/me',     [MeController::class,   'update']);

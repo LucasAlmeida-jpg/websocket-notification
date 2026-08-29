@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\NotificationType;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class NotificationController extends Controller
 {
@@ -68,7 +70,7 @@ class NotificationController extends Controller
     {
         $data = $request->validate([
             'recipient_id'  => 'required|integer|exists:users,id|different:' . $request->user()->id,
-            'type'          => 'required|string|in:like,comment,follow,mention',
+            'type'          => ['required', 'string', Rule::in(array_column(NotificationType::cases(), 'value'))],
             'message'       => 'required|string|max:255',
             'resource_type' => 'nullable|string|max:50',
             'resource_id'   => 'nullable|integer',
@@ -77,7 +79,7 @@ class NotificationController extends Controller
         $this->notifications->notify(
             recipient:    User::findOrFail($data['recipient_id']),
             actor:        $request->user(),
-            type:         $data['type'],
+            type:         NotificationType::from($data['type']),
             message:      $data['message'],
             resourceType: $data['resource_type'] ?? '',
             resourceId:   $data['resource_id'] ?? 0,

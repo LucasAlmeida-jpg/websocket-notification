@@ -16,7 +16,7 @@ class MeController extends Controller
         $data = $request->validate([
             'name'   => ['sometimes', 'string', 'max:100'],
             'bio'    => ['sometimes', 'nullable', 'string', 'max:300'],
-            'avatar' => ['sometimes', 'nullable', 'string'],
+            'avatar' => ['sometimes', 'nullable', 'url', 'max:2048'],
         ]);
 
         return response()->json($this->me->update($request->user(), $data));

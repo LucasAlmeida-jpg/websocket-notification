@@ -1,7 +1,8 @@
-const errorMessage = useState<string | null>('error-toast', () => null)
 let timer: ReturnType<typeof setTimeout> | null = null
 
 export function useErrorToast() {
+  const errorMessage = useState<string | null>('error-toast', () => null)
+
   function showError(message: string) {
     if (timer) clearTimeout(timer)
     errorMessage.value = message
