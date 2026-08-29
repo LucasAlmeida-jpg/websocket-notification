@@ -45,18 +45,19 @@
 import { computed } from 'vue'
 import { Check, Trash2, Heart, MessageCircle, UserPlus, AtSign, Bell, Repeat2, Send } from 'lucide-vue-next'
 import { timeAgo } from '~/utils/timeAgo'
+import { NotificationType } from '~/types'
 import type { Notification } from '~/types'
 
 const props = defineProps<{ notification: Notification }>()
 const emit = defineEmits<{ markRead: [id: string]; remove: [id: string] }>()
 
 const iconMap: Record<string, { component: unknown; bg: string; color: string }> = {
-  like:    { component: Heart,          bg: 'bg-red-500/20',    color: 'text-red-400' },
-  comment: { component: MessageCircle,  bg: 'bg-blue-500/20',   color: 'text-blue-400' },
-  follow:  { component: UserPlus,       bg: 'bg-violet-500/20', color: 'text-violet-400' },
-  mention: { component: AtSign,         bg: 'bg-amber-500/20',  color: 'text-amber-400' },
-  repost:  { component: Repeat2,        bg: 'bg-green-500/20',  color: 'text-green-400' },
-  share:   { component: Send,           bg: 'bg-sky-500/20',    color: 'text-sky-400' },
+  [NotificationType.Like]:    { component: Heart,         bg: 'bg-red-500/20',    color: 'text-red-400' },
+  [NotificationType.Comment]: { component: MessageCircle, bg: 'bg-blue-500/20',   color: 'text-blue-400' },
+  [NotificationType.Follow]:  { component: UserPlus,      bg: 'bg-violet-500/20', color: 'text-violet-400' },
+  [NotificationType.Mention]: { component: AtSign,        bg: 'bg-amber-500/20',  color: 'text-amber-400' },
+  [NotificationType.Repost]:  { component: Repeat2,       bg: 'bg-green-500/20',  color: 'text-green-400' },
+  [NotificationType.Share]:   { component: Send,          bg: 'bg-sky-500/20',    color: 'text-sky-400' },
 }
 
 const iconComponent = computed(() => iconMap[props.notification.data.type]?.component ?? Bell)

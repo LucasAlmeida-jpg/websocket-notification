@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\NotificationType;
 use App\Models\Post;
 use App\Models\User;
 
@@ -27,7 +28,7 @@ class PostService
                 $this->notifications->notify(
                     recipient:    $parent->user,
                     actor:        $author,
-                    type:         'comment',
+                    type:         NotificationType::Comment,
                     message:      'respondeu ao seu post.',
                     resourceType: 'post',
                     resourceId:   $post->id,
@@ -88,7 +89,7 @@ class PostService
             $this->notifications->notify(
                 recipient:    $user,
                 actor:        $actor,
-                type:         'mention',
+                type:         NotificationType::Mention,
                 message:      'mencionou você em um post.',
                 resourceType: 'post',
                 resourceId:   $postId,

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\NotificationType;
 use App\Models\Post;
 use App\Models\Repost;
 use App\Models\User;
@@ -29,7 +30,7 @@ class RepostService
                 $this->notifications->notify(
                     recipient:    $post->user,
                     actor:        $user,
-                    type:         'repost',
+                    type:         NotificationType::Repost,
                     message:      'repostou seu post.',
                     resourceType: 'post',
                     resourceId:   $post->id,

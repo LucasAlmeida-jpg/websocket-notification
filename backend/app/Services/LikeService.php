@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\NotificationType;
 use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
@@ -29,7 +30,7 @@ class LikeService
                 $this->notifications->notify(
                     recipient:    $post->user,
                     actor:        $user,
-                    type:         'like',
+                    type:         NotificationType::Like,
                     message:      'curtiu seu post.',
                     resourceType: 'post',
                     resourceId:   $post->id,

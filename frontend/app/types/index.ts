@@ -17,8 +17,19 @@ export interface Post {
   user: User
 }
 
+export const NotificationType = {
+  Like:    'like',
+  Comment: 'comment',
+  Follow:  'follow',
+  Mention: 'mention',
+  Repost:  'repost',
+  Share:   'share',
+} as const
+
+export type NotificationTypeValue = typeof NotificationType[keyof typeof NotificationType]
+
 export interface NotificationData {
-  type: string
+  type: NotificationTypeValue
   message: string
   actor_id: number
   actor_name: string

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\NotificationType;
 use App\Events\NotificationCreated;
 use App\Models\User;
 use App\Notifications\SocialNotification;
@@ -11,14 +12,14 @@ class NotificationService
     public function notify(
         User $recipient,
         User $actor,
-        string $type,
+        NotificationType $type,
         string $message,
         string $resourceType,
         int $resourceId
     ): void {
         $recipient->notify(new SocialNotification(
             actor:        $actor,
-            type:         $type,
+            type:         $type->value,
             message:      $message,
             resourceType: $resourceType,
             resourceId:   $resourceId,
@@ -26,7 +27,7 @@ class NotificationService
 
         try {
             broadcast(new NotificationCreated($recipient, [
-                'type'          => $type,
+                'type'          => $type->value,
                 'message'       => $message,
                 'actor_id'      => $actor->id,
                 'actor_name'    => $actor->name,

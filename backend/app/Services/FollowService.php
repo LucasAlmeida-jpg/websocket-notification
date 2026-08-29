@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\NotificationType;
 use App\Models\Follow;
 use App\Models\User;
 
@@ -27,7 +28,7 @@ class FollowService
             $this->notifications->notify(
                 recipient:    $target,
                 actor:        $actor,
-                type:         'follow',
+                type:         NotificationType::Follow,
                 message:      'começou a te seguir.',
                 resourceType: 'user',
                 resourceId:   $actor->id,

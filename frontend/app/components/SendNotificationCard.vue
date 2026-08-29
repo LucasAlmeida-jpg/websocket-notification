@@ -25,10 +25,10 @@
             v-model="form.type"
             class="w-full rounded-lg border border-neutral-700 bg-neutral-900 text-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-white/20 focus:border-neutral-600 transition"
           >
-            <option value="like">like</option>
-            <option value="comment">comment</option>
-            <option value="follow">follow</option>
-            <option value="mention">mention</option>
+            <option :value="NotificationType.Like">like</option>
+            <option :value="NotificationType.Comment">comment</option>
+            <option :value="NotificationType.Follow">follow</option>
+            <option :value="NotificationType.Mention">mention</option>
           </select>
         </div>
       </div>
@@ -72,12 +72,13 @@
 import { ref, reactive } from 'vue'
 import { Send, Loader2, CircleCheck, CircleX } from 'lucide-vue-next'
 import { useApi } from '~/composables/useApi'
+import { NotificationType } from '~/types'
 
 const { post } = useApi()
 
 const form = reactive({
   recipient_id: null as number | null,
-  type: 'like' as 'like' | 'comment' | 'follow' | 'mention',
+  type: NotificationType.Like as typeof NotificationType[keyof typeof NotificationType],
   message: '',
 })
 
